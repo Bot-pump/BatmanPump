@@ -1,2 +1,1 @@
-# BatmanPump
-Crypto Bot for Telegram – Batman Style
+# Instructions for setup and deployment
