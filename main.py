@@ -3,30 +3,37 @@ import time
 import requests
 import telebot
 
+# Load environment variables
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHANNEL_USERNAME = os.getenv("CHANNEL_USERNAME", "@BatmanPump")
-PROXY_URL = os.getenv("PROXY_URL")
+PROXY_URL = os.getenv("PROXY_URL")  # Example: https://your-dexproxy.onrender.com/proxy
 
 bot = telebot.TeleBot(BOT_TOKEN)
 sent_tokens = set()
 
 def fetch_tokens(chain):
-    url = f"{PROXY_URL}/v1/token/new?chain={chain}&limit=10"
+    # Build proxy call to Moralis API
+    target = f"https://token-api.moralis.io/v1/token/new?chain={chain}&limit=10"
+    url = f"{PROXY_URL}?url={target}"
+
     try:
         response = requests.get(url, timeout=10)
         data = response.json()
         tokens = []
+
         for token in data.get("pairs", []):
             name = token.get("baseToken", {}).get("name", "Unknown")
             symbol = token.get("baseToken", {}).get("symbol", "Unknown")
             price = token.get("priceUsd", "0.00")
-            url = f"https://dexscreener.com/{chain}/{token.get('pairAddress', '')}"
+            chart_url = f"https://dexscreener.com/{chain}/{token.get('pairAddress', '')}"
+
             tokens.append({
                 "name": name,
                 "symbol": symbol,
                 "price": price,
-                "url": url
+                "url": chart_url
             })
+
         return tokens
     except Exception as e:
         print(f"[{chain.upper()}] Error:", e)
@@ -42,6 +49,7 @@ def send_new_tokens():
             price = token["price"]
             url = token["url"]
             key = f"{symbol}:{price}"
+
             if key not in sent_tokens:
                 msg = (
                     f"*🚀 New Token Detected on {chain.upper()}*\n\n"
@@ -56,13 +64,13 @@ def send_new_tokens():
                 except Exception as e:
                     print("Telegram Error:", e)
 
-# رسالة ترحيب عند بدء التشغيل
+# Send startup message
 try:
     bot.send_message(CHANNEL_USERNAME, "✅ BatmanPump Bot is now running and monitoring new tokens on Solana, Ethereum, BSC, and Base!")
 except Exception as e:
     print("Failed to send startup message:", e)
 
-# تكرار العملية كل 30 ثانية
+# Repeat every 30 seconds
 while True:
     send_new_tokens()
     time.sleep(30)
