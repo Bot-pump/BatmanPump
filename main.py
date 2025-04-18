@@ -43,24 +43,26 @@ def send_new_tokens():
             url = token["url"]
             key = f"{symbol}:{price}"
             if key not in sent_tokens:
-                msg = f"*New Token Detected on {chain}*\n"
-
-*Name:* {name}
-*Symbol:* {symbol}
-*Price:* ${price}
-[Chart]({url})"
+                msg = (
+                    f"*🚀 New Token Detected on {chain.upper()}*\n\n"
+                    f"*Name:* {name}\n"
+                    f"*Symbol:* {symbol}\n"
+                    f"*Price:* ${price}\n"
+                    f"[Chart]({url})"
+                )
                 try:
                     bot.send_message(CHANNEL_USERNAME, msg, parse_mode="Markdown")
                     sent_tokens.add(key)
                 except Exception as e:
                     print("Telegram Error:", e)
 
-# رسالة ترحيب
+# رسالة ترحيب عند بدء التشغيل
 try:
     bot.send_message(CHANNEL_USERNAME, "✅ BatmanPump Bot is now running and monitoring new tokens on Solana, Ethereum, BSC, and Base!")
 except Exception as e:
     print("Failed to send startup message:", e)
 
+# تكرار العملية كل 30 ثانية
 while True:
     send_new_tokens()
     time.sleep(30)
