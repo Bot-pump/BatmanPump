@@ -1,7 +1,13 @@
-
 services:
   - type: worker
-    name: batmanpump-bot
+    name: BatmanPump
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python main.py
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python main.py"
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: CHANNEL_USERNAME
+        sync: false
+      - key: PROXY_URL
+        sync: false
