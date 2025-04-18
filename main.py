@@ -27,7 +27,7 @@ def send_new_tokens():
 
             unique_key = f"{chain}:{symbol}:{price}"
             if unique_key not in sent_tokens:
-                msg = f"🚀 *New Token Detected on {display}*
+                msg = f"🚀 *New Token Detected on {display}*"
 
 *Name:* {name}
 *Symbol:* {symbol}
