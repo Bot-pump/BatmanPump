@@ -1,26 +1,23 @@
 import os
-import time
 import requests
-import telebot
 
-# جلب المتغيرات من البيئة
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-CHANNEL_USERNAME = os.getenv("CHANNEL_USERNAME", "@BatmanPump")
-PROXY_URL = os.getenv("PROXY_URL")  # مثال: https://your-dexproxy-url.onrender.com/proxy
-
-bot = telebot.TeleBot(BOT_TOKEN)
-sent_tokens = set()
+# Get proxy URL from environment variable
+PROXY_URL = os.getenv("PROXY_URL")  # Example: https://your-dexproxy.onrender.com/proxy
 
 def fetch_tokens(chain):
-    # رابط Moralis الأصلي نمرره كـ باراميتر إلى البروكسي
+    """
+    Fetch the latest tokens for a given chain using DexProxy + Moralis API.
+    Returns a list of token dictionaries.
+    """
+    # Prepare target Moralis API URL and wrap it through DexProxy
     target = f"https://token-api.moralis.io/v1/token/new?chain={chain}&limit=10"
     url = f"{PROXY_URL}?url={target}"
 
     try:
         response = requests.get(url, timeout=10)
         data = response.json()
-        tokens = []
 
+        tokens = []
         for token in data.get("pairs", []):
             name = token.get("baseToken", {}).get("name", "Unknown")
             symbol = token.get("baseToken", {}).get("symbol", "Unknown")
@@ -35,42 +32,7 @@ def fetch_tokens(chain):
             })
 
         return tokens
+
     except Exception as e:
-        print(f"[{chain.upper()}] Error:", e)
+        print(f"[{chain.upper()}] Error fetching tokens:", e)
         return []
-
-def send_new_tokens():
-    chains = ["solana", "bsc", "ethereum", "base"]
-    for chain in chains:
-        tokens = fetch_tokens(chain)
-        for token in tokens:
-            name = token["name"]
-            symbol = token["symbol"]
-            price = token["price"]
-            url = token["url"]
-            key = f"{symbol}:{price}"
-
-            if key not in sent_tokens:
-                msg = (
-                    f"*🚀 New Token Detected on {chain.upper()}*\n\n"
-                    f"*Name:* {name}\n"
-                    f"*Symbol:* {symbol}\n"
-                    f"*Price:* ${price}\n"
-                    f"[Chart]({url})"
-                )
-                try:
-                    bot.send_message(CHANNEL_USERNAME, msg, parse_mode="Markdown")
-                    sent_tokens.add(key)
-                except Exception as e:
-                    print("Telegram Error:", e)
-
-# رسالة ترحيب عند التشغيل
-try:
-    bot.send_message(CHANNEL_USERNAME, "✅ BatmanPump Bot is now running and monitoring new tokens on Solana, Ethereum, BSC, and Base!")
-except Exception as e:
-    print("Failed to send startup message:", e)
-
-# تكرار التنفيذ كل 30 ثانية
-while True:
-    send_new_tokens()
-    time.sleep(30)
