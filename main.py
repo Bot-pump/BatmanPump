@@ -43,7 +43,7 @@ def send_new_tokens():
             url = token["url"]
             key = f"{symbol}:{price}"
             if key not in sent_tokens:
-                msg = f"*🚀 New Token Detected on {chain.upper()}*\n\n*Name:* {name}\n*Symbol:* {symbol}\n*Price:* ${price}\n[Chart]({url})"
+                msg = f"*New Token Detected on {chain}*\n"
 
 *Name:* {name}
 *Symbol:* {symbol}
