@@ -1,44 +1,38 @@
-import os
 import requests
+import os
 
-# Ensure the PROXY_URL ends with /proxy
-base_proxy = os.getenv("PROXY_URL", "").rstrip("/")
-if not base_proxy.endswith("/proxy"):
-    base_proxy += "/proxy"
-PROXY_URL = base_proxy
+APIFY_TOKEN = os.getenv("APIFY_TOKEN")  # Your Apify personal token
 
-def fetch_tokens(chain):
-    target = f"https://token-api.moralis.io/v1/token/new?chain={chain}&limit=10"
-    url = f"{PROXY_URL}?url={target}"
+def fetch_tokens(chain=None):
+    # chain is unused but kept for compatibility with main bot logic
+    url = f"https://api.apify.com/v2/acts/muhammetakkurtt~gmgn-new-pair-scraper/run-sync-get-dataset-items?token={APIFY_TOKEN}"
 
     try:
-        print(f"[DEBUG] Fetching tokens for chain: {chain}")
-        print(f"[DEBUG] Full URL: {url}")
-
-        response = requests.get(url, timeout=10)
+        print("[DEBUG] Fetching tokens from Apify Pump.fun actor...")
+        response = requests.get(url, timeout=30)
         print(f"[DEBUG] Status Code: {response.status_code}")
-        print(f"[DEBUG] Raw Response: {response.text}")
+        print(f"[DEBUG] Raw Response: {response.text[:500]}")  # Limit output for safety
 
         data = response.json()
         tokens = []
 
-        for token in data.get("pairs", []):
-            name = token.get("baseToken", {}).get("name", "Unknown")
-            symbol = token.get("baseToken", {}).get("symbol", "Unknown")
-            price = token.get("priceUsd", "0.00")
-            pair_address = token.get("pairAddress", "unknown")
+        for token in data:
+            if token.get("status", "").lower() == "graduated":
+                name = token.get("name", "Unknown")
+                symbol = token.get("symbol", "Unknown")
+                price = token.get("price_usd", "0.00")
+                url = token.get("chart_url", "#")
 
-            chart_url = f"https://dexscreener.com/{chain}/{pair_address}"
-            print(f"[INFO] New token: {symbol} - ${price} - {chart_url}")
+                tokens.append({
+                    "name": name,
+                    "symbol": symbol,
+                    "price": price,
+                    "url": url
+                })
 
-            tokens.append({
-                "name": name,
-                "symbol": symbol,
-                "price": price,
-                "url": chart_url
-            })
-
+        print(f"[INFO] Total graduated tokens found: {len(tokens)}")
         return tokens
+
     except Exception as e:
-        print(f"[ERROR] Failed to fetch tokens for {chain.upper()}: {e}")
+        print("[ERROR] Failed to fetch tokens from Apify:", e)
         return []
