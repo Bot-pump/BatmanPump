@@ -20,15 +20,10 @@ def send_new_tokens():
 
         if key not in sent_tokens:
             msg = (
-                "*🚀 New Token Detected on PUMP.FUN*
-
-"
-                f"*Name:* {name}
-"
-                f"*Symbol:* {symbol}
-"
-                f"*Price:* ${price}
-"
+                f"🚀 *New Token Detected on PUMP.FUN*\n\n"
+                f"*Name:* {name}\n"
+                f"*Symbol:* {symbol}\n"
+                f"*Price:* ${price}\n"
                 f"[Chart]({url})"
             )
             try:
