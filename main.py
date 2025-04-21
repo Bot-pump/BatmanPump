@@ -20,7 +20,7 @@ def send_new_tokens():
 
         if key not in sent_tokens:
             msg = (
-                f"*🚀 New Token Detected on PUMP.FUN*
+                "*🚀 New Token Detected on PUMP.FUN*
 
 "
                 f"*Name:* {name}
