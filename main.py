@@ -13,6 +13,13 @@ def send_new_tokens():
     tokens = fetch_tokens()
     print(f"[DEBUG] Fetched {len(tokens)} tokens.")
 
+    if not tokens:
+        try:
+            bot.send_message(CHANNEL_USERNAME, "🤖 No new tokens found at the moment.")
+        except Exception as e:
+            print("[ERROR] Failed to send empty message:", e)
+        return
+
     for token in tokens:
         name = token.get("name", "N/A")
         symbol = token.get("symbol", "N/A")
@@ -39,7 +46,7 @@ def send_new_tokens():
 
 # Startup message
 try:
-    bot.send_message(CHANNEL_USERNAME, "✅ BatmanPump Bot is now running and fetching all pump.fun tokens (including price=0)!")
+    bot.send_message(CHANNEL_USERNAME, "✅ BatmanPump Bot is active and watching pump.fun!")
 except Exception as e:
     print("Failed to send startup message:", e)
 
