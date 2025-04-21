@@ -1,23 +1,21 @@
 import os
 import requests
 
-# Get proxy URL from environment variable
-PROXY_URL = os.getenv("PROXY_URL")  # Example: https://your-dexproxy.onrender.com/proxy
+PROXY_URL = os.getenv("PROXY_URL")  # مثل: https://dexproxy-xxxxx.onrender.com/proxy
 
 def fetch_tokens(chain):
-    """
-    Fetch the latest tokens for a given chain using DexProxy + Moralis API.
-    Returns a list of token dictionaries.
-    """
-    # Prepare target Moralis API URL and wrap it through DexProxy
     target = f"https://token-api.moralis.io/v1/token/new?chain={chain}&limit=10"
     url = f"{PROXY_URL}?url={target}"
 
     try:
         response = requests.get(url, timeout=10)
-        data = response.json()
+        print(f"[DEBUG] URL: {url}")
+        print(f"[DEBUG] STATUS: {response.status_code}")
+        print(f"[DEBUG] RESPONSE: {response.text}")
 
+        data = response.json()
         tokens = []
+
         for token in data.get("pairs", []):
             name = token.get("baseToken", {}).get("name", "Unknown")
             symbol = token.get("baseToken", {}).get("symbol", "Unknown")
@@ -32,7 +30,6 @@ def fetch_tokens(chain):
             })
 
         return tokens
-
     except Exception as e:
-        print(f"[{chain.upper()}] Error fetching tokens:", e)
+        print(f"[ERROR] Failed fetching from Moralis: {e}")
         return []
