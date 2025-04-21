@@ -1,8 +1,9 @@
 import os
 import time
 import telebot
-from fetch_tokens import fetch_tokens  # Apify-based token fetcher
+from fetch_tokens import fetch_tokens  # Import token fetcher for gmgn.ai
 
+# Telegram bot and channel configuration
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHANNEL_USERNAME = os.getenv("CHANNEL_USERNAME", "@BatmanPump")
 
@@ -11,13 +12,13 @@ sent_tokens = set()
 
 def send_new_tokens():
     tokens = fetch_tokens()
-    print(f"[DEBUG] Fetched {len(tokens)} tokens.")
+    print(f"[DEBUG] Fetched {len(tokens)} tokens from gmgn.ai")
 
     if not tokens:
         try:
-            bot.send_message(CHANNEL_USERNAME, "🤖 No new tokens found at the moment.")
+            bot.send_message(CHANNEL_USERNAME, "🤖 No new tokens found on gmgn.ai.")
         except Exception as e:
-            print("[ERROR] Failed to send empty message:", e)
+            print("[ERROR] Failed to send fallback message:", e)
         return
 
     for token in tokens:
@@ -29,28 +30,28 @@ def send_new_tokens():
 
         if key not in sent_tokens:
             msg = (
-                f"🚀 *New Token Detected on PUMP.FUN*\n\n"
-                f"*Name:* {name}\n"
-                f"*Symbol:* {symbol}\n"
-                f"*Price:* ${price}\n"
+                f"🚀 *New Token Detected on gmgn.ai*\\n\\n"
+                f"*Name:* {name}\\n"
+                f"*Symbol:* {symbol}\\n"
+                f"*Price:* ${price}\\n"
                 f"[Chart]({url})"
             )
             try:
                 bot.send_message(CHANNEL_USERNAME, msg, parse_mode="Markdown")
                 sent_tokens.add(key)
-                print(f"[SENT] {symbol} sent to Telegram.")
+                print(f"[SENT] Token {symbol} sent.")
             except Exception as e:
-                print("[ERROR] Telegram sending failed:", e)
+                print("[ERROR] Telegram send failed:", e)
         else:
-            print(f"[SKIPPED] Already sent: {symbol}")
+            print(f"[SKIPPED] Token {symbol} already sent.")
 
-# Startup message
+# Send startup message
 try:
-    bot.send_message(CHANNEL_USERNAME, "✅ BatmanPump Bot is active and watching pump.fun!")
+    bot.send_message(CHANNEL_USERNAME, "✅ BatmanPump is now watching gmgn.ai!")
 except Exception as e:
-    print("Failed to send startup message:", e)
+    print("[ERROR] Failed to send startup message:", e)
 
-# Run every 30 seconds
+# Run the process every 30 seconds
 while True:
     send_new_tokens()
     time.sleep(30)
