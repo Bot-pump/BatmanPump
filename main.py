@@ -26,15 +26,10 @@ def send_all_tokens():
         url = token.get("url", "#")
 
         msg = (
-            f"🚀 *Token from gmgn/pump.fun*
-
-"
-            f"*Name:* {name}
-"
-            f"*Symbol:* {symbol}
-"
-            f"*Price:* ${price}
-"
+            "🚀 *Token from gmgn/pump.fun*\n\n"
+            f"*Name:* {name}\n"
+            f"*Symbol:* {symbol}\n"
+            f"*Price:* ${price}\n"
             f"[Chart]({url})"
         )
         try:
