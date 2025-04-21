@@ -1,7 +1,11 @@
 import os
 import requests
 
-PROXY_URL = os.getenv("PROXY_URL")  # Example: https://dexproxy-xxxxx.onrender.com/proxy
+# Ensure the PROXY_URL ends with /proxy
+base_proxy = os.getenv("PROXY_URL", "").rstrip("/")
+if not base_proxy.endswith("/proxy"):
+    base_proxy += "/proxy"
+PROXY_URL = base_proxy
 
 def fetch_tokens(chain):
     target = f"https://token-api.moralis.io/v1/token/new?chain={chain}&limit=10"
