@@ -20,9 +20,8 @@ def fetch_tokens(chain=None):
             price = base_info.get("price", 0)
             pool_id = base_info.get("pool_id")
 
-            if name and symbol and pool_id and price and float(price) > 0:
+            if name and symbol and pool_id:
                 chart_url = f"https://pump.fun/{pool_id}"
-
                 tokens.append({
                     "name": name,
                     "symbol": symbol,
@@ -30,7 +29,8 @@ def fetch_tokens(chain=None):
                     "url": chart_url
                 })
 
-        print(f"[INFO] Total tokens returned: {len(tokens)}")
+        print(f"[INFO] Total tokens fetched (including price=0): {len(tokens)}")
+        print(tokens)  # Show all fetched tokens for debugging
         return tokens
 
     except Exception as e:
